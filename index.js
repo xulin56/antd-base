@@ -18,14 +18,30 @@ const columns = [{
   title: '姓名',
   dataIndex: 'name',
   key: 'name',
+  render: text => <a href="#">{text}</a>
 }, {
   title: '年龄',
   dataIndex: 'age',
   key: 'age',
+  sorter: (a, b) => a.age - b.age
 }, {
   title: '住址',
   dataIndex: 'address',
   key: 'address',
+  render: (text, record) => {
+    console.log(record);
+    return (
+      <span>
+        <a href="#">Action 一 {record.name}</a>
+        <span className="ant-divider" />
+        <a href="#">Delete</a>
+        <span className="ant-divider" />
+        <a href="#" className="ant-dropdown-link">
+          More actions <Icon type="down" />
+        </a>
+      </span>
+    );
+  }
 }];
 
 class App extends React.Component {
@@ -64,18 +80,21 @@ class App extends React.Component {
     //     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
     //   },
     //   // on fire twice when first load
-    //XXXX
+    //XXXXX
     //   getCheckboxProps: record => ({
     //     disabled: record.name === 'Disabled User',    // Column configuration not to be checked
     //   }),
     // };
 
+    const onChange = (pagination, filters, sorter)=> {
+      console.log('params', pagination, filters, sorter);
+    }
+
     return (
-      <div style={{ width: 400, margin: '100px auto' }}>
+      <div style={{ width: 700, margin: '100px auto' }}>
         <DatePicker onChange={value => this.handleChange(value)} />
         <div style={{ marginTop: 20 }}>当前日期：{this.state.date.toString()}</div>
-
-        <Table rowSelection={rowSelection} dataSource={dataSource} columns={columns} />
+        <Table onChange={onChange} rowSelection={rowSelection} dataSource={dataSource} columns={columns} />
       </div>
     );
   }
