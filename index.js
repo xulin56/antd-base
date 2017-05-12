@@ -28,25 +28,54 @@ const columns = [{
   key: 'address',
 }];
 
-
-
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       date: '',
-    };
+      selectedRowKeys: [],  // Check here to configure the default column
+      loading: false,
+    }
   }
+
   handleChange(date) {
     message.info('您选择的日期是: ' + date.toString());
     this.setState({ date });
   }
+
+  onSelectChange = (selectedRowKeys) => {
+    console.log('selectedRowKeys changed: ', selectedRowKeys);
+    this.setState({ selectedRowKeys });
+  }
+
   render() {
+
+    const { loading, selectedRowKeys } = this.state;
+
+    const rowSelection = {
+      selectedRowKeys,
+      onChange: this.onSelectChange,
+    };
+
+    const hasSelected = selectedRowKeys.length > 0;
+
+    // const rowSelection = {
+    //   onChange: (selectedRowKeys, selectedRows) => {console.log('onChange;')
+    //     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+    //   },
+    //   // on fire twice when first load
+    //XXXX
+    //   getCheckboxProps: record => ({
+    //     disabled: record.name === 'Disabled User',    // Column configuration not to be checked
+    //   }),
+    // };
+
     return (
       <div style={{ width: 400, margin: '100px auto' }}>
         <DatePicker onChange={value => this.handleChange(value)} />
         <div style={{ marginTop: 20 }}>当前日期：{this.state.date.toString()}</div>
-        <Table dataSource={dataSource} columns={columns} />
+
+        <Table rowSelection={rowSelection} dataSource={dataSource} columns={columns} />
       </div>
     );
   }
