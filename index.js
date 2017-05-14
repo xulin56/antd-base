@@ -2,6 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { DatePicker, message, Table, Icon } from 'antd';
 
+import PropTypes from 'prop-types';
+
+import Pagination from './pagination/Pagination'
+
 const dataSource = [{
   key: '1',
   name: '胡彦斌',
@@ -29,7 +33,7 @@ const columns = [{
   dataIndex: 'address',
   key: 'address',
   render: (text, record) => {
-    console.log(record);
+    console.log('record in columns of address:', record);
     return (
       <span>
         <a href="#">Action 一 {record.name}</a>
@@ -47,12 +51,24 @@ const columns = [{
 class App extends React.Component {
   constructor(props) {
     super(props);
+    const defaultCurrent = 2;
+
     this.state = {
       date: '',
       selectedRowKeys: [],  // Check here to configure the default column
       loading: false,
+      'pageNumber': defaultCurrent
     }
   }
+
+  // getInitialState() {
+  //   return {
+  //     date: '',
+  //     selectedRowKeys: [],  // Check here to configure the default column
+  //     loading: false,
+  //     'pageNumber': defaultCurrent
+  //   }
+  // }
 
   handleChange(date) {
     message.info('您选择的日期是: ' + date.toString());
@@ -62,6 +78,12 @@ class App extends React.Component {
   onSelectChange = (selectedRowKeys) => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     this.setState({ selectedRowKeys });
+  }
+
+  onPagination = (argus) => {
+    console.log('onPagination ', argus);
+    this.setState({'pageNumber': argus});
+    console.log(this.state);
   }
 
   render() {
@@ -87,7 +109,12 @@ class App extends React.Component {
     // };
 
     const onChange = (pagination, filters, sorter)=> {
-      console.log('params', pagination, filters, sorter);
+      console.log('params in onChange:', pagination, filters, sorter);
+      console.log( rowSelection, 'is rowSelection')
+    }
+
+    const onShowSizeChange = (current, pageSize) => {
+      console.log(current, pageSize);
     }
 
     return (
@@ -95,6 +122,9 @@ class App extends React.Component {
         <DatePicker onChange={value => this.handleChange(value)} />
         <div style={{ marginTop: 20 }}>当前日期：{this.state.date.toString()}</div>
         <Table onChange={onChange} rowSelection={rowSelection} dataSource={dataSource} columns={columns} />
+
+        <Pagination onPagination={this.onPagination.bind(this)} defaultCurrent={this.state.pageNumber} total={50} />
+
       </div>
     );
   }
