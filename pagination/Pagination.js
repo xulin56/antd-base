@@ -19,19 +19,20 @@ class SlicePagination extends React.Component {
     }
   }
 
-  render(argus) { console.log(argus, this.props, 'in Pagination.render')
+  render(argus) { 
+    // console.log(argus, this.props, 'in Pagination.render')
 
     const { loading, selectedRowKeys } = this.state;
     const { onPagination, defaultCurrent } = this.props;
 
     //when page size been modified
     const onShowSizeChange = (pageNumber, pageSize) => {
-      console.log( 'onShowSizeChange:', 'pageNumber:', pageNumber, 'pageSize:', pageSize );
+      // console.log( 'onShowSizeChange:', 'pageNumber:', pageNumber, 'pageSize:', pageSize );
     }
 
     //when page id been modified
     function onChange(pageNumber) {
-      console.log('onChange, pageNumber: ', pageNumber);
+      // console.log('onChange, pageNumber: ', pageNumber);
       onPagination(pageNumber);
     }
 
@@ -45,7 +46,7 @@ class SlicePagination extends React.Component {
         	showSizeChanger
 
           pageSizeOptions={[ '10', '20', '30' ]}
-          showTotal={total => `Total ${total} items`}
+          // showTotal={total => `Total ${total} items`}
         	onShowSizeChange={onShowSizeChange}
           onChange={onChange}
           showTotal={showTotal}
