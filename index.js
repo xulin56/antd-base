@@ -4,9 +4,29 @@ import { DatePicker, message, Icon } from 'antd';
 
 import PropTypes from 'prop-types';
 
+
 import Pagination from './pagination/Pagination';
 import Table from './table/table';
 
+import 'babel-polyfill';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
+import App from './sliceList/containers/App';
+import configureStore from './sliceList/store/configureStore';
+
+const store = configureStore();
+
+render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
+
+
+/*
+
+/*
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -19,7 +39,7 @@ class App extends React.Component {
       pageNumber: defaultCurrent
     }
   }
-  
+
   handleChange(date) {
     message.info('您选择的日期是: ' + date.toString());
     this.setState({ date });
@@ -70,4 +90,6 @@ class App extends React.Component {
   }
 }
 
+
 ReactDOM.render(<App />, document.getElementById('root'));
+*/
