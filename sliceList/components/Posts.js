@@ -4,7 +4,7 @@ function Posts({ posts }) {
   return (
     <ul>
       {posts.map((post, i) =>
-        <li key={i}>{post.title}</li>
+        <li key={i}>{post.slice_name}</li>
       )}
     </ul>
   );

@@ -2,64 +2,68 @@ import fetch from 'isomorphic-fetch';
 
 export const REQUEST_POSTS = 'REQUEST_POSTS';
 export const RECEIVE_POSTS = 'RECEIVE_POSTS';
-export const SELECT_REDDIT = 'SELECT_REDDIT';
-export const INVALIDATE_REDDIT = 'INVALIDATE_REDDIT';
+export const NAVIGATE_TO = 'NAVIGATE_TO';
 
-export function selectReddit(reddit) {
+const data = require('./../../responses/data.json');
+console.log(data);
+export function navigateTo(pageNumber){
   return {
-    type: SELECT_REDDIT,
-    reddit,
-  };
+    pageNumber,
+    type: NAVIGATE_TO
+  }
 }
 
-export function invalidateReddit(reddit) {
-  return {
-    type: INVALIDATE_REDDIT,
-    reddit,
-  };
-}
-
-function requestPosts(reddit) {
+function requestPosts(pageNumber) {
   return {
     type: REQUEST_POSTS,
-    reddit,
+    pageNumber,
   };
 }
 
-function receivePosts(reddit, json) {
+function receivePosts(pageNumber, json) {
   return {
     type: RECEIVE_POSTS,
-    reddit,
-    posts: json.data.children.map(child => child.data),
-    receivedAt: Date.now(),
+    pageNumber,
+    posts: json.data, //.data.children.map(child => child.data),
+    receivedAt: Date.now()
   };
 }
 
-function fetchPosts(reddit) {
+function fetchPosts(pageNumber) {
+  // const URL = 'http://172.16.1.67:8086/slicemodelview/listdata/';
+  const URL = 'http://localhost:8000/response/data.json';
+
   return dispatch => {
-    dispatch(requestPosts(reddit));
-    return fetch(`https://www.reddit.com/r/${reddit}.json`)
-      .then(response => response.json())
-      .then(json => dispatch(receivePosts(reddit, json)));
+    // dispatch(requestPosts(pageNumber));
+    // return fetch(URL)
+      // .then(response => response.data)
+      // .then(json => dispatch(receivePosts(pageNumber, json)));
+
+    return ( dispatch(receivePosts(pageNumber, data )))
   };
 }
 
-function shouldFetchPosts(state, reddit) {
-  const posts = state.postsByReddit[reddit];
-  if (!posts) {
-    return true;
-  }
-  if (posts.isFetching) {
-    return false;
-  }
-  return posts.didInvalidate;
-}
+// TODO:
+// function shouldFetchPosts(state, pageNumber) {
+//   const posts = state.postsBypageNumber[pageNumber];
+//   if (!posts) {
+//     return true;
+//   }
+//   if (posts.isFetching) {
+//     return false;
+//   }
+//   return posts.didInvalidate;
+// }
 
-export function fetchPostsIfNeeded(reddit) {
+export function fetchPostsIfNeeded(pageNumber) {
   return (dispatch, getState) => {
-    if (shouldFetchPosts(getState(), reddit)) {
-      return dispatch(fetchPosts(reddit));
-    }
-    return null;
+    //TODO:
+    // if (shouldFetchPosts(getState(), pageNumber)) {
+    //   return dispatch(fetchPosts(pageNumber));
+    // }
+    // return null;
+
+    return dispatch(fetchPosts(pageNumber));
+
   };
 }

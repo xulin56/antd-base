@@ -1,45 +1,56 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { navigateTo, fetchPostsIfNeeded } from '../actions';
+import { selectReddit, fetchPostsIfNeeded, invalidateReddit } from '../actions';
 import Picker from '../components/Picker';
 import Posts from '../components/Posts';
-
-
-import Pagination from '../../pagination/Pagination';
 
 class App extends Component {
   constructor(props) {
     super(props);
     // console.log('inside constructor of app: props: ', props)
-    // this.onPagination = this.onPagination.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleRefreshClick = this.handleRefreshClick.bind(this);
   }
 
   componentDidMount() {
+    console.log('执行componentDidMount');
     const { dispatch, selectedReddit } = this.props;
-    dispatch(fetchPostsIfNeeded(selectedReddit.pageNumber));
+    dispatch(fetchPostsIfNeeded(selectedReddit));
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.selectedReddit.pageNumber !== this.props.selectedReddit.pageNumber) {
+    console.log('执行componentWillReceiveProps', nextProps);
+    if (nextProps.selectedReddit !== this.props.selectedReddit) {
       const { dispatch, selectedReddit } = nextProps;
-      dispatch(fetchPostsIfNeeded(selectedReddit.pageNumber));
+      dispatch(fetchPostsIfNeeded(selectedReddit));
     }
   }
 
-  onPagination(argus) {
-    this.props.dispatch( navigateTo(argus) );
-    console.log('what is that:', this.props );
+  handleChange(nextReddit) {
+    this.props.dispatch(selectReddit(nextReddit));
+  }
+
+  handleRefreshClick(e) {
+    e.preventDefault();
+
+    const { dispatch, selectedReddit } = this.props;
+    dispatch(invalidateReddit(selectedReddit));
+    dispatch(fetchPostsIfNeeded(selectedReddit));
   }
 
   render() {
     const { selectedReddit, posts, isFetching, lastUpdated } = this.props;
     const isEmpty = posts.length === 0;
-    const pageNumber = selectedReddit.pageNumber;
     const message = isFetching ? <h2>Loading...</h2> : <h2>Empty.</h2>;
 
     // console.log('inside render of app: props: ', this.props)
     return (
       <div>
+        <Picker
+          value={selectedReddit}
+          onChange={this.handleChange}
+          options={['reactjs', 'frontend']}  />
+
         <p>
           {lastUpdated &&
             <span>
@@ -61,16 +72,13 @@ class App extends Component {
             <Posts posts={posts} />
           </div>
           }
-        <Pagination onPagination={this.onPagination.bind(this)} defaultCurrent={pageNumber} total={50} />
-        
       </div>
     );
   }
 }
 
 App.propTypes = {
-  // pageNumber: PropTypes.number.isRequired,
-  selectedReddit: PropTypes.object.isRequired,
+  selectedReddit: PropTypes.string.isRequired,
   posts: PropTypes.array.isRequired,
   isFetching: PropTypes.bool.isRequired,
   lastUpdated: PropTypes.number,
@@ -78,33 +86,29 @@ App.propTypes = {
 };
 
 function mapStateToProps(state) {
-  const { postsBypageNumber, selectedReddit } = state;
+  const { selectedReddit, postsByReddit } = state;
+
+  console.log( 'in mapStateToProps:1：', state );
 
   const {
     isFetching,
     lastUpdated,
     items: posts,
-  } = postsBypageNumber[selectedReddit.pageNumber] || {
+  } = postsByReddit[selectedReddit] || {
     isFetching: true,
     items: [],
   };
 
-  return {
+  const obj = {
     selectedReddit,
     posts,
     isFetching,
     lastUpdated,
   };
+
+  console.log( 'in mapStateToProps:2：', obj );
+
+  return obj;
 }
 
-
 export default connect(mapStateToProps)(App);
-
-// export default connect(
-//   state => ({ pageNumber: state.selectedReddit.pageNumber }),
-//   dispatch => ({
-//     navigateTo: navigateTo => dispatch(navigateTo(state.selectedReddit.pageNumber)),
-//     fetchPostsIfNeeded: fetchPostsIfNeeded => dispatch(fetchPostsIfNeeded(state.selectedReddit.pageNumber))
-//   }),
-
-// )(App);
